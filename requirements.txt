@@ -1,7 +1,5 @@
-fastapi
-starlette
-uvicorn
-motor
+flask
+python-dotenv
+pymongo[srv]
 requests
 beautifulsoup4
-pymongo[srv]
