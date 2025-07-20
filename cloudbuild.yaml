@@ -1,0 +1,64 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - '--build-arg' 
+      - 'MONGO_URI_ARG=${_MONGO_URI_FROM_SECRET}'
+      - 'FITEASY_EMAIL_ARG=${_FITEASY_EMAIL_FROM_SECRET}'
+      - 'FITEASY_PASSWORD_ARG=${_FITEASY_PASSWORD_FROM_SECRET}'
+      - .
+      - '-f'
+      - Dockerfile
+    id: Build
+    secretEnv: ['_MONGO_URI_FROM_SECRET', '_FITEASY_EMAIL_FROM_SECRET', '_FITEASY_PASSWORD_FROM_SECRET']
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - >-
+        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    id: Push
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - >-
+        --image=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+    id: Deploy
+    entrypoint: gcloud
+images:
+  - >-
+    $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _AR_PROJECT_ID: gen-lang-client-0755733728
+  _PLATFORM: managed
+  _SERVICE_NAME: lamp-speaker
+  _DEPLOY_REGION: asia-northeast1
+  _AR_HOSTNAME: asia-northeast1-docker.pkg.dev
+  _TRIGGER_ID: 11b677ac-2dfd-4e71-b001-3c7fec2d5301
+  _AR_REPOSITORY: cloud-run-source-deploy
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - lamp-speaker
+availableSecrets:
+  secretManager:
+    - versionName: projects/$_AR_PROJECT_ID/secrets/MONGO_URI/versions/latest
+      env: '_MONGO_URI_FROM_SECRET'
+    - versionName: projects/$_AR_PROJECT_ID/secrets/FITEASY_EMAIL/versions/latest
+      env: '_FITEASY_EMAIL_FROM_SECRET'
+    - versionName: projects/$_AR_PROJECT_ID/secrets/FITEASY_PASSWORD/versions/latest
+      env: '_FITEASY_PASSWORD_FROM_SECRET'
