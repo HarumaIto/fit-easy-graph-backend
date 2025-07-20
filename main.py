@@ -1,12 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from flask import Flask, jsonify
 from scraper import fetch_congestion_info
 
-app = FastAPI()
+app = Flask(__name__)
 
-@app.get("/congestion")
+@app.route("/congestion", methods=["GET"])
 def get_congestion():
     try:
         info = fetch_congestion_info()
-        return info
+        return jsonify(info)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return jsonify({"detail": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)
