@@ -43,17 +43,17 @@ options:
   substitutionOption: ALLOW_LOOSE
   logging: CLOUD_LOGGING_ONLY
 substitutions:
-  _AR_PROJECT_ID: gen-lang-client-0755733728
-  _PLATFORM: managed
-  _SERVICE_NAME: lamp-speaker
-  _DEPLOY_REGION: asia-northeast1
-  _AR_HOSTNAME: asia-northeast1-docker.pkg.dev
-  _TRIGGER_ID: 11b677ac-2dfd-4e71-b001-3c7fec2d5301
   _AR_REPOSITORY: cloud-run-source-deploy
+  _AR_PROJECT_ID: fit-easy-graph
+  _PLATFORM: managed
+  _TRIGGER_ID: cb7d6acf-1bf5-4212-b161-b609f06296c3
+  _SERVICE_NAME: fit-easy-graph-backend
+  _DEPLOY_REGION: asia-northeast2
+  _AR_HOSTNAME: asia-northeast2-docker.pkg.dev
 tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
-  - lamp-speaker
+  - fit-easy-graph-backend
 availableSecrets:
   secretManager:
     - versionName: projects/$_AR_PROJECT_ID/secrets/MONGO_URI/versions/latest
