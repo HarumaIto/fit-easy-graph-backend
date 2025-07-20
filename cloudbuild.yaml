@@ -10,7 +10,6 @@ steps:
       - '-f'
       - Dockerfile
     id: Build
-    secretEnv: ['_MONGO_URI_FROM_SECRET', '_FITEASY_EMAIL_FROM_SECRET', '_FITEASY_PASSWORD_FROM_SECRET']
   - name: gcr.io/cloud-builders/docker
     args:
       - push
