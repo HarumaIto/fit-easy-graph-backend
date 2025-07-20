@@ -10,6 +10,7 @@ steps:
       - '-f'
       - Dockerfile
     id: Build
+    secretEnv: ['MONGO_URI', 'FITEASY_EMAIL', 'FITEASY_PASSWORD']
   - name: gcr.io/cloud-builders/docker
     args:
       - push
@@ -50,3 +51,11 @@ tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
   - fit-easy-graph-backend
+availableSecrets:
+  secretManager:
+    - versionName: projects/$_AR_PROJECT_ID/secrets/MONGO_URI/versions/latest
+      env: 'MONGO_URI'
+    - versionName: projects/$_AR_PROJECT_ID/secrets/FITEASY_EMAIL/versions/latest
+      env: 'FITEASY_EMAIL'
+    - versionName: projects/$_AR_PROJECT_ID/secrets/FITEASY_PASSWORD/versions/latest
+      env: 'FITEASY_PASSWORD'
