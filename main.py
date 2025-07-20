@@ -42,12 +42,10 @@ def post_congestion():
         info = fetch_congestion_info()
         # データ構造を整形
         doc = {
-            "gym_id": info.get("gym_id", "shop_id_61"),
+            "gym_id": "shop_id_61",
             "gym_name": info.get("gym_name", "イオンタウン弥富店"),
             "timestamp": datetime.utcnow(),
-            "congestion_level": info.get("congestion_level"),
-            "raw_count": info.get("raw_count"),
-            "source": "web_scraping",
+            "congestion_level": info.get("level"),
             # 必要に応じて天気なども追加可能
         }
         result = collection.insert_one(doc)
