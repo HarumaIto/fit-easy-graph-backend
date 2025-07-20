@@ -6,12 +6,6 @@ steps:
       - '-t'
       - >-
         $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-      - '--build-arg'
-      - MONGO_URI_ARG=${_MONGO_URI_FROM_SECRET}
-      - '--build-arg'
-      - FITEASY_EMAIL_ARG=${_FITEASY_EMAIL_FROM_SECRET}
-      - '--build-arg'
-      - FITEASY_PASSWORD_ARG=${_FITEASY_PASSWORD_FROM_SECRET}
       - .
       - '-f'
       - Dockerfile
@@ -35,6 +29,7 @@ steps:
       - >-
         --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
       - '--region=$_DEPLOY_REGION'
+      - --set-secrets=MONGO_URI=projects/$_AR_PROJECT_ID/secrets/MONGO_URI:latest,FITEASY_EMAIL=projects/$_AR_PROJECT_ID/secrets/FITEASY_EMAIL:latest,FITEASY_PASSWORD=projects/$_AR_PROJECT_ID/secrets/FITEASY_PASSWORD:latest
       - '--quiet'
     id: Deploy
     entrypoint: gcloud
@@ -56,11 +51,3 @@ tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
   - fit-easy-graph-backend
-availableSecrets:
-  secretManager:
-    - versionName: projects/$_AR_PROJECT_ID/secrets/MONGO_URI/versions/latest
-      env: '_MONGO_URI_FROM_SECRET'
-    - versionName: projects/$_AR_PROJECT_ID/secrets/FITEASY_EMAIL/versions/latest
-      env: '_FITEASY_EMAIL_FROM_SECRET'
-    - versionName: projects/$_AR_PROJECT_ID/secrets/FITEASY_PASSWORD/versions/latest
-      env: '_FITEASY_PASSWORD_FROM_SECRET'
