@@ -14,7 +14,7 @@ load_dotenv()
 # MongoDBクライアント設定
 try:
     # Create a new client and connect to the server
-    MONGO_URI = os.environ.get("MONGO_URI")
+    MONGO_URI = os.getenv("MONGO_URI")
     client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
 except Exception as e:
     print("An Invalid URI host error was received. Is your Atlas host name correct in your connection string?")
@@ -54,5 +54,5 @@ def post_congestion():
         return jsonify({"detail": str(e)}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.getenv("PORT", 8080))
     app.run(host="0.0.0.0", port=port)

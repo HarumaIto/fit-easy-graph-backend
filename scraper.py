@@ -17,8 +17,8 @@ load_dotenv()
 
 def fetch_congestion_info(target_name="イオンタウン弥富店"):
     # 認証情報は環境変数から取得
-    email = os.environ.get("FITEASY_EMAIL")
-    password = os.environ.get("FITEASY_PASSWORD")
+    email = os.getenv("FITEASY_EMAIL")
+    password = os.getenv("FITEASY_PASSWORD")
     if not email or not password:
         raise Exception("環境変数 FITEASY_EMAIL または FITEASY_PASSWORD が設定されていません。")
 
