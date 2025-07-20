@@ -44,7 +44,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 substitutions:
   _AR_REPOSITORY: cloud-run-source-deploy
-  _AR_PROJECT_ID: 752052537093
+  _AR_PROJECT_ID: fit-easy-graph
   _PLATFORM: managed
   _TRIGGER_ID: cb7d6acf-1bf5-4212-b161-b609f06296c3
   _SERVICE_NAME: fit-easy-graph-backend
