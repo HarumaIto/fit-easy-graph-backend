@@ -16,7 +16,6 @@ try:
     # Create a new client and connect to the server
     MONGO_URI = os.environ.get("MONGO_URI")
     client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
-    client.admin.command('ping')
 except Exception as e:
     print("An Invalid URI host error was received. Is your Atlas host name correct in your connection string?")
     sys.exit(1)
@@ -42,7 +41,7 @@ def post_congestion():
         info = fetch_congestion_info()
         # データ構造を整形
         doc = {
-            "gym_id": "shop_id_61",
+            "gym_id": "61",
             "gym_name": info.get("gym_name", "イオンタウン弥富店"),
             "timestamp": datetime.utcnow(),
             "congestion_level": info.get("level"),
