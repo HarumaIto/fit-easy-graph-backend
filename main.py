@@ -5,7 +5,7 @@ from pymongo.server_api import ServerApi
 from flask import Flask, jsonify, request
 from scraper import fetch_congestion_info
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 app = Flask(__name__)
 
@@ -39,11 +39,12 @@ def get_congestion():
 def post_congestion():
     try:
         info = fetch_congestion_info()
-        # データ構造を整形
+        # 日本時間（JST: UTC+9）でtimestampを付与
+        jst = timezone(timedelta(hours=9))
         doc = {
             "gym_id": "61",
             "gym_name": info.get("gym_name", "イオンタウン弥富店"),
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(jst),
             "congestion_level": info.get("level"),
             # 必要に応じて天気なども追加可能
         }
