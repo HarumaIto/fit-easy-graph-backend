@@ -4,3 +4,4 @@ uvicorn
 motor
 requests
 beautifulsoup4
+pymongo[srv]
