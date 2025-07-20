@@ -1,0 +1,6 @@
+fastapi
+starlette
+uvicorn
+motor
+requests
+beautifulsoup4
