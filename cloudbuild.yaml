@@ -6,7 +6,13 @@ steps:
       - '-t'
       - >-
         $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-      - '.'
+      - '--build-arg'
+      - MONGO_URI_ARG=${_MONGO_URI_FROM_SECRET}
+      - '--build-arg'
+      - FITEASY_EMAIL_ARG=${_FITEASY_EMAIL_FROM_SECRET}
+      - '--build-arg'
+      - FITEASY_PASSWORD_ARG=${_FITEASY_PASSWORD_FROM_SECRET}
+      - .
       - '-f'
       - Dockerfile
     id: Build
