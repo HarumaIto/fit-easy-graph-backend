@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  title: FitEasy Graph Backend API
+  description: FitEasyジムの混雑状況を自動取得・管理するRESTful API
+  version: 1.0.0
+  contact:
+    name: FitEasy Graph Backend
+    url: https://github.com/your-username/fit-easy-graph-backend
+
+servers:
+  - url: https://fit-easy-graph-backend-xxxxx-an.a.run.app
+    description: Production server (Google Cloud Run)
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /congestion:
+    get:
+      summary: 単一店舗の混雑情報取得
+      description: 指定された店舗の現在の混雑状況を取得します
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CongestionInfo'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: 混雑情報の保存
+      description: 混雑情報を取得してMongoDBに保存します
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inserted_id:
+                    type: string
+                    description: 挿入されたドキュメントのID
+                    example: "64a7b2c8f1e2d3a4b5c6d7e8"
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /congestion/multiple:
+    get:
+      summary: 複数店舗の混雑情報取得
+      description: 複数の店舗の混雑状況を一度に取得します
+      parameters:
+        - name: targets
+          in: query
+          description: 取得対象の店舗名リスト
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+            default: ["イオンタウン弥富店"]
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CongestionInfo'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /congestion/batch:
+    post:
+      summary: 複数店舗の情報をバッチ保存
+      description: 複数店舗の混雑情報を一度に取得してデータベースに保存します
+      requestBody:
+        description: 取得対象の店舗名リスト
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targets:
+                  type: array
+                  items:
+                    type: string
+                  example: ["イオンタウン弥富店", "店舗2"]
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /session/status:
+    get:
+      summary: セッション状態確認
+      description: 現在のログインセッションの状態を確認します
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStatus'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    CongestionInfo:
+      type: object
+      properties:
+        gym_name:
+          type: string
+          description: ジム店舗名
+          example: "イオンタウン弥富店"
+        level:
+          type: integer
+          description: 混雑レベル（数値）
+          example: 3
+          minimum: 1
+          maximum: 5
+        error:
+          type: string
+          description: エラーメッセージ（エラー時のみ）
+          example: "店舗が見つかりませんでした。"
+      required:
+        - gym_name
+        - level
+
+    BatchResponse:
+      type: object
+      properties:
+        inserted_count:
+          type: integer
+          description: 挿入されたドキュメント数
+          example: 2
+        inserted_ids:
+          type: array
+          items:
+            type: string
+          description: 挿入されたドキュメントのIDリスト
+          example: ["64a7b2c8f1e2d3a4b5c6d7e8", "64a7b2c8f1e2d3a4b5c6d7e9"]
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CongestionInfo'
+          description: 取得結果の詳細
+      required:
+        - inserted_count
+        - inserted_ids
+        - results
+
+    SessionStatus:
+      type: object
+      properties:
+        session_valid:
+          type: boolean
+          description: セッションが有効かどうか
+          example: true
+        login_time:
+          type: string
+          format: date-time
+          description: ログイン時刻（ISO 8601形式）
+          example: "2025-07-25T10:30:45+09:00"
+        session_timeout_hours:
+          type: number
+          description: セッションタイムアウト時間（時間）
+          example: 2.0
+      required:
+        - session_valid
+        - session_timeout_hours
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: エラーメッセージ
+          example: "環境変数 FITEASY_EMAIL または FITEASY_PASSWORD が設定されていません。"
+      required:
+        - detail
