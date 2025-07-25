@@ -3,7 +3,7 @@ import sys
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from flask import Flask, jsonify, request
-from scraper import fetch_congestion_info
+from scraper import fetch_congestion_info, fetch_multiple_congestion_info, get_fit_easy_session
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 
@@ -50,6 +50,22 @@ def post_congestion():
         }
         result = collection.insert_one(doc)
         return jsonify({"inserted_id": str(result.inserted_id)})
+    except Exception as e:
+        return jsonify({"detail": str(e)}), 500
+
+@app.route("/session/status", methods=["GET"])
+def get_session_status():
+    """現在のセッション状態を確認"""
+    try:
+        session_manager = get_fit_easy_session()
+        is_valid = session_manager.is_session_valid()
+        login_time = session_manager.login_time.isoformat() if session_manager.login_time else None
+        
+        return jsonify({
+            "session_valid": is_valid,
+            "login_time": login_time,
+            "session_timeout_hours": session_manager.session_timeout.total_seconds() / 3600
+        })
     except Exception as e:
         return jsonify({"detail": str(e)}), 500
 
